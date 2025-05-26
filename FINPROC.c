@@ -8,7 +8,6 @@ typedef struct {
     int umur;
     float berat;
     float tinggi;
-    float bmi;
     char riwayatPenyakit[200];
     char alergi[200];
     char statusVaksin[100];
