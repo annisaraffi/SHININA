@@ -167,13 +167,14 @@ void cekSyaratVaksin(Pasien p) {
         printf("[OK] Vaksin HPV sudah lengkap (berdasarkan data).\n");
         printf("Kesimpulan: Vaksinasi HPV sudah lengkap.\n");
         printf("--------------------------------------------\n");
-        return; // Tidak perlu cek syarat lain jika sudah lengkap
+        return;
     }
 
     // Jika belum lengkap, lanjutkan pengecekan syarat
     int layak = 1;
     int rekomendasi_usia_ditemukan = 0;
 
+    // Cek kontraindikasi utama
     if (p.alergi_berat_vaksin == 1) {
         printf("[X] Tidak disarankan: Riwayat alergi berat thd komponen vaksin (ragi).\n");
         layak = 0;
@@ -187,7 +188,14 @@ void cekSyaratVaksin(Pasien p) {
         layak = 0;
     }
 
-    // Cek Usia (hanya relevan jika belum lengkap)
+    // Jika ada kontraindikasi, langsung ke kesimpulan
+    if (!layak) {
+        printf("Kesimpulan: Vaksinasi HPV tidak disarankan atau perlu ditunda saat ini.\n");
+        printf("--------------------------------------------\n");
+        return;
+    }
+
+    // Lanjut cek usia hanya jika tidak ada kontraindikasi
     int usia_min_rekomendasi = 9;
     int usia_max_rekomendasi = 26;
     int usia_max_catchup = 45;
@@ -201,20 +209,24 @@ void cekSyaratVaksin(Pasien p) {
         rekomendasi_usia_ditemukan = 1;
     } else if (p.umur > usia_max_catchup) {
         printf("[X] Usia (%d thn) melebihi batas usia catch-up (45 thn).\n", p.umur);
-        layak = 0; // Usia tidak memenuhi syarat
+        layak = 0;
     } else { // p.umur < usia_min_rekomendasi
         printf("[X] Usia (%d thn) di bawah batas usia minimal (9 thn).\n", p.umur);
-        layak = 0; // Usia tidak memenuhi syarat
+        layak = 0;
     }
 
-    // Cek Dosis (hanya jika usia memungkinkan dan belum lengkap)
-    if (rekomendasi_usia_ditemukan) { // Status 'belum' sudah pasti dari cek awal
-        if (p.dosis_vaksin < 3) {
-            printf("[!] Perlu melanjutkan/memulai vaksinasi HPV (Dosis ke-%d).\n", p.dosis_vaksin + 1);
-        } else {
-            // Seharusnya tidak terjadi jika status 'belum' tapi dosis 3
-            printf("[INFO] Telah menerima 3 dosis, status seharusnya 'lengkap'. Harap perbarui data.\n");
-        }
+    // Jika usia tidak memenuhi syarat, langsung ke kesimpulan
+    if (!layak) {
+        printf("Kesimpulan: Vaksinasi HPV tidak disarankan atau perlu ditunda saat ini.\n");
+        printf("--------------------------------------------\n");
+        return;
+    }
+
+    // Cek Dosis hanya jika usia memungkinkan dan tidak ada kontraindikasi
+    if (p.dosis_vaksin < 3) {
+        printf("[!] Perlu melanjutkan/memulai vaksinasi HPV (Dosis ke-%d).\n", p.dosis_vaksin + 1);
+    } else {
+        printf("[INFO] Telah menerima 3 dosis, status seharusnya 'lengkap'. Harap perbarui data.\n");
     }
 
     // Info Tambahan
@@ -225,12 +237,8 @@ void cekSyaratVaksin(Pasien p) {
         printf("[INFO] Pasien dg gangguan pembekuan darah: perlu perhatian khusus saat injeksi.\n");
     }
 
-    // Kesimpulan (hanya jika belum lengkap)
-    if (layak && rekomendasi_usia_ditemukan) {
-        printf("Kesimpulan: Vaksinasi HPV dapat dilanjutkan/dimulai.\n");
-    } else if (!layak) {
-        printf("Kesimpulan: Vaksinasi HPV tidak disarankan atau perlu ditunda saat ini.\n");
-    }
+    // Kesimpulan akhir jika semua syarat terpenuhi
+    printf("Kesimpulan: Vaksinasi HPV dapat dilanjutkan/dimulai.\n");
     printf("--------------------------------------------\n");
 }
 
@@ -245,6 +253,7 @@ void tambahPasien() {
     Pasien *p_baru = &daftar_pasien[jumlah_pasien];
     char buffer[PANJANG_BUFFER];
 
+    // Perubahan: Tampilkan nomor pasien sebagai jumlah_pasien + 1 (bukan jumlah_pasien + 1)
     printf("--- Input Data Pasien ke-%d ---\n", jumlah_pasien + 1);
 
     printf("Nama Lengkap: ");
