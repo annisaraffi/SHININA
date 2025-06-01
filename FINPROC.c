@@ -346,7 +346,7 @@ void tampilkanSemuaPasien() {
 
     if (pilihan_cek == 1) {
         if (jumlah_pasien > 0) {
-            int no_pasien = bacaInteger("Masukkan nomor pasien (1-N): ", 1, jumlah_pasien);
+            int no_pasien = bacaInteger("Masukkan nomor pasien: ", 1, jumlah_pasien);
             cekSyaratVaksin(daftar_pasien[no_pasien - 1]);
         } else {
             printf("Tidak ada pasien untuk dicek.\n");
@@ -367,7 +367,7 @@ void editPasien() {
         printf("%d. %s\n", i + 1, daftar_pasien[i].nama);
     }
 
-    int no_pasien = bacaInteger("Pilih nomor pasien yang akan diedit (1-N): ", 1, jumlah_pasien);
+    int no_pasien = bacaInteger("Pilih nomor pasien yang akan diedit: ", 1, jumlah_pasien);
     int index_pasien = no_pasien - 1;
     Pasien *p = &daftar_pasien[index_pasien];
 
@@ -444,6 +444,19 @@ void editPasien() {
     } while (pilihan_edit != 5);
 }
 
+void hapusDataPasienKeN(int index) {
+    if (index < 0 || index >= jumlah_pasien) {
+        printf("Index tidak valid!\n");
+        return;
+    }
+    
+    for (int i = index; i < jumlah_pasien - 1; i++) {
+        daftar_pasien[i] = daftar_pasien[i + 1];
+    }
+    jumlah_pasien--;
+    printf("Data pasien ke-%d berhasil dihapus.\n", index + 1);
+}
+
 void resetSemuaData() {
     if (daftar_pasien != NULL) {
         free(daftar_pasien);
@@ -452,6 +465,49 @@ void resetSemuaData() {
     jumlah_pasien = 0;
     printf("Semua data pasien berhasil di-reset.\n");
 }
+
+void hapusDataPasien(Pasien *daftar_pasien, int *jumlah_pasien) {
+    int pilihan_hapus;
+    do {
+        printf("\n--- Menu Hapus Data Pasien ---\n");
+        printf("1. Hapus data pasien ke-n\n");
+        printf("2. Reset semua data pasien\n");
+        printf("3. Kembali ke menu utama\n");
+
+        pilihan_hapus = bacaInteger("Pilih opsi (1-3): ", 1, 3);
+
+        switch (pilihan_hapus) {
+            case 1: { // Hapus pasien ke-n
+                if (*jumlah_pasien == 0) {
+                    printf("Tidak ada data pasien untuk dihapus.\n");
+                    break;
+                }
+                printf("\nDaftar Pasien:\n");
+                for (int i = 0; i < *jumlah_pasien; i++) {
+                    printf("%d. %s\n", i + 1, daftar_pasien[i].nama);
+    }
+                int nomor = bacaInteger("Masukkan nomor pasien yang akan dihapus: ", 1, *jumlah_pasien);
+                for (int i = nomor - 1; i < *jumlah_pasien - 1; i++) {
+                    daftar_pasien[i] = daftar_pasien[i + 1];
+                }
+                (*jumlah_pasien)--;
+                printf("Data pasien ke-%d berhasil dihapus.\n", nomor);
+                break;
+            }
+            case 2: // Reset semua data
+                *jumlah_pasien = 0;
+                printf("Semua data pasien berhasil di-reset.\n");
+                break;
+            case 3: // Kembali ke menu utama
+                printf("Kembali ke menu utama...\n");
+                break;
+            default:
+                printf("Pilihan tidak valid.\n");
+                break;
+        }
+    } while (pilihan_hapus != 3);
+}
+
 
 // --- Fungsi Utama (main) --- 
 int main() {
@@ -463,11 +519,11 @@ int main() {
         printf("1. Tambah Data Pasien & Cek Syarat Vaksin\n");
         printf("2. Tampilkan Semua Data Pasien\n");
         printf("3. Edit Data Pasien\n"); 
-        printf("4. Reset Semua Data Pasien\n");
-        printf("5. Hapus Data Pasien Berdasarkan Nomor\n");
+        printf("4. Hapus Data Pasien\n");
+        printf("5. Keluar dari program\n");
         printf("===============================================\n");
         printf("Jumlah Pasien Tersimpan: %d\n", jumlah_pasien);
-        printf("Pilih menu (1-4): ");
+        printf("Pilih menu (1-5): ");
 
         if (scanf("%d", &pilihan) != 1) {
             printf("Input tidak valid. Masukkan angka menu.\n");
@@ -488,7 +544,7 @@ int main() {
                 editPasien(); 
                 break;
             case 4:
-                resetSemuaData();
+                hapusDataPasien(daftar_pasien, &jumlah_pasien);
             case 5:
                 printf("Menyimpan data sebelum keluar...\n");
                 simpanDataKeFile();
