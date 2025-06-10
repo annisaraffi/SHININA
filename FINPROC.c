@@ -1,27 +1,27 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h> // Untuk tolower()
+#include <ctype.h> 
 
 // Struktur Data Pasien
 #define PANJANG_NAMA 30
 #define PANJANG_INFO 50
-#define PANJANG_BUFFER 100 // Buffer untuk input string
+#define PANJANG_BUFFER 100 
 #define NAMA_FILE_DATA "pasien_data.bin"
 
 typedef struct {
     char nama[PANJANG_NAMA];
     int umur;
-    char jenis_kelamin[10]; // pria/wanita
+    char jenis_kelamin[10]; 
     char riwayat_penyakit[PANJANG_INFO];
     char riwayat_alergi[PANJANG_INFO];
-    char status_vaksin[10]; // belum/lengkap
+    char status_vaksin[10]; 
     int dosis_vaksin;
-    int hamil; // 0 = Tidak, 1 = Ya
-    int alergi_berat_vaksin; // 0 = Tidak, 1 = Ya (alergi ragi)
-    int sakit_berat_saat_ini; // 0 = Tidak, 1 = Ya
-    int imunokompromais; // 0 = Tidak, 1 = Ya (HIV)
-    int gangguan_darah; // 0 = Tidak, 1 = Ya
+    int hamil; 
+    int alergi_berat_vaksin; 
+    int sakit_berat_saat_ini;
+    int imunokompromais; 
+    int gangguan_darah; 
 } Pasien;
 
 // Penyimpanan Data Dinamis
@@ -88,7 +88,7 @@ int bacaYaTidak(const char *prompt) {
     }
 }
 
-// --- Fungsi File Handling --- 
+//Fungsi File Handling 
 void simpanDataKeFile() {
     FILE *file = fopen(NAMA_FILE_DATA, "wb");
     if (file == NULL) {
@@ -155,8 +155,7 @@ void muatDataDariFile() {
     }
     fclose(file);
 }
-
-// --- Fungsi Utama Aplikasi --- 
+ 
 
 // Fungsi untuk mendapatkan status kelayakan vaksin (ringkasan untuk tabel)
 const char* getKelayakanStatus(Pasien p) {
@@ -179,7 +178,7 @@ const char* getKelayakanStatus(Pasien p) {
     int usia_min_rekomendasi = 9;
     int usia_max_catchup = 45;
     if (p.umur < usia_min_rekomendasi || p.umur > usia_max_catchup) {
-        return "TIDAK"; // Usia tidak sesuai
+        return "TIDAK"; 
     }
 
     // Jika lolos semua cek di atas
@@ -195,7 +194,7 @@ void cekSyaratVaksin(Pasien p) {
         printf("[OK] Vaksin HPV sudah lengkap (berdasarkan data).\n");
         printf("Kesimpulan: Vaksinasi HPV sudah lengkap.\n");
         printf("--------------------------------------------\n");
-        return; // Tidak perlu cek syarat lain jika sudah lengkap
+        return; 
     }
 
     // Jika belum lengkap, lanjutkan pengecekan syarat
@@ -229,23 +228,21 @@ void cekSyaratVaksin(Pasien p) {
         rekomendasi_usia_ditemukan = 1;
     } else if (p.umur > usia_max_catchup) {
         printf("[X] Usia (%d thn) melebihi batas usia catch-up (45 thn).\n", p.umur);
-        layak = 0; // Usia tidak memenuhi syarat
-    } else { // p.umur < usia_min_rekomendasi
+        layak = 0; 
+    } else { 
         printf("[X] Usia (%d thn) di bawah batas usia minimal (9 thn).\n", p.umur);
-        layak = 0; // Usia tidak memenuhi syarat
+        layak = 0; 
     }
 
     // Cek Dosis (hanya jika usia memungkinkan dan belum lengkap)
-    if (rekomendasi_usia_ditemukan) { // Status 'belum' sudah pasti dari cek awal
+    if (rekomendasi_usia_ditemukan) { 
         if (p.dosis_vaksin < 3) {
             printf("[!] Perlu melanjutkan/memulai vaksinasi HPV (Dosis ke-%d).\n", p.dosis_vaksin + 1);
         } else {
-            // Seharusnya tidak terjadi jika status 'belum' tapi dosis 3
             printf("[INFO] Telah menerima 3 dosis, status seharusnya 'lengkap'. Harap perbarui data.\n");
         }
     }
 
-    // Info Tambahan
     if (p.imunokompromais == 1) {
         printf("[INFO] Pasien imunokompromais (HIV): mungkin perlu jadwal/dosis khusus.\n");
     }
@@ -253,7 +250,7 @@ void cekSyaratVaksin(Pasien p) {
         printf("[INFO] Pasien dg gangguan pembekuan darah: perlu perhatian khusus saat injeksi.\n");
     }
 
-    // Kesimpulan (hanya jika belum lengkap)
+    // Kesimpulan 
     if (layak && rekomendasi_usia_ditemukan) {
         printf("Kesimpulan: Vaksinasi HPV dapat dilanjutkan/dimulai.\n");
     } else if (!layak) {
@@ -262,7 +259,6 @@ void cekSyaratVaksin(Pasien p) {
     printf("--------------------------------------------\n");
 }
 
-// Revisi: Gunakan bacaYaTidak untuk input boolean
 void tambahPasien() {
     Pasien *temp = realloc(daftar_pasien, (jumlah_pasien + 1) * sizeof(Pasien));
     if (temp == NULL) {
@@ -278,7 +274,7 @@ void tambahPasien() {
     printf("Nama Lengkap: ");
     fgets(p_baru->nama, PANJANG_NAMA, stdin);
     p_baru->nama[strcspn(p_baru->nama, "\n")] = 0;
-    // Handle jika input pertama kosong (kadang terjadi setelah scanf integer)
+    // jika input pertama kosong (kadang terjadi setelah scanf integer)
     if (strlen(p_baru->nama) == 0) { 
         fgets(p_baru->nama, PANJANG_NAMA, stdin);
         p_baru->nama[strcspn(p_baru->nama, "\n")] = 0;
@@ -324,7 +320,7 @@ void tambahPasien() {
     if (strcmp(p_baru->status_vaksin, "belum") == 0) {
         p_baru->dosis_vaksin = bacaInteger("Jumlah dosis vaksin HPV yg sudah diterima (0-3): ", 0, 3);
     } else {
-        p_baru->dosis_vaksin = 3; // Jika lengkap, otomatis 3 dosis
+        p_baru->dosis_vaksin = 3; 
     }
 
     // Gunakan bacaYaTidak
@@ -339,8 +335,7 @@ void tambahPasien() {
 
     jumlah_pasien++;
     printf("\nData pasien '%s' berhasil ditambahkan.\n", p_baru->nama);
-    // Tidak otomatis cek detail setelah tambah, user bisa cek via menu baru
-    // cekSyaratVaksin(*p_baru); 
+    
 }
 
 // Revisi: Tambah kolom kelayakan, hapus pertanyaan detail di akhir
@@ -350,7 +345,6 @@ void tampilkanSemuaPasien() {
         printf("Belum ada data pasien.\n");
         return;
     }
-    // Menyesuaikan lebar tabel untuk kolom baru
     printf("--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     printf("No | %-*s | Umur | Sex | Status HPV | Dosis | Layak Vaksin? | Hamil | Alergi Ragi | Sakit Berat | Imuno | Ggn Darah | Riwayat Penyakit/Alergi\n", PANJANG_NAMA, "Nama");
     printf("--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
@@ -363,7 +357,7 @@ void tampilkanSemuaPasien() {
             (strcmp(daftar_pasien[i].jenis_kelamin, "pria") == 0) ? "P" : "W",
             daftar_pasien[i].status_vaksin,
             daftar_pasien[i].dosis_vaksin,
-            status_kelayakan, // Kolom baru
+            status_kelayakan, 
             (strcmp(daftar_pasien[i].jenis_kelamin, "wanita") == 0) ? (daftar_pasien[i].hamil ? "Ya" : "Tidak") : "-",
             daftar_pasien[i].alergi_berat_vaksin ? "Ya" : "Tidak",
             daftar_pasien[i].sakit_berat_saat_ini ? "Ya" : "Tidak",
@@ -374,18 +368,6 @@ void tampilkanSemuaPasien() {
     printf("--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     printf("Keterangan: Sex(P/W), Status HPV(belum/lengkap), Layak Vaksin?(BISA/TIDAK/TUNDA/Lengkap), Hamil(Ya/Tidak/-), Alergi Ragi(Ya/Tidak), Sakit Berat(Ya/Tidak), Imuno(Ya/Tidak), Ggn Darah(Ya/Tidak)\n");
 
-    // Pertanyaan detail dihilangkan sesuai permintaan
-    /*
-    int pilihan_cek = bacaYaTidak("\nIngin melihat detail cek syarat vaksin untuk pasien tertentu?");
-    if (pilihan_cek == 1) {
-        if (jumlah_pasien > 0) {
-            int no_pasien = bacaInteger("Masukkan nomor pasien: ", 1, jumlah_pasien);
-            cekSyaratVaksin(daftar_pasien[no_pasien - 1]);
-        } else {
-            printf("Tidak ada pasien untuk dicek.\n");
-        }
-    }
-    */
 }
 
 // Fungsi baru untuk menu lihat detail pasien
@@ -428,7 +410,7 @@ void editPasien() {
 
     do {
         printf("\n--- Menu Edit untuk %s ---\n", p->nama);
-        // Tampilkan data yang bisa diedit
+        // output data yang bisa diedit
         printf("1. Nama: %s\n", p->nama);
         printf("2. Umur: %d\n", p->umur);
         printf("3. Jenis Kelamin: %s\n", p->jenis_kelamin);
@@ -437,9 +419,9 @@ void editPasien() {
         printf("6. Status Vaksin HPV: %s\n", p->status_vaksin);
         printf("7. Jumlah Dosis Vaksin: %d (Hanya relevan jika status 'belum')\n", p->dosis_vaksin);
         if (strcmp(p->jenis_kelamin, "wanita") == 0) {
-             printf("8. Status Hamil: %s\n", p->hamil ? "Ya" : "Tidak");
+            printf("8. Status Hamil: %s\n", p->hamil ? "Ya" : "Tidak");
         } else {
-             printf("8. Status Hamil: (Tidak Berlaku untuk Pria)\n");
+            printf("8. Status Hamil: (Tidak Berlaku untuk Pria)\n");
         }
         printf("9. Riwayat Alergi Berat Vaksin (Ragi): %s\n", p->alergi_berat_vaksin ? "Ya" : "Tidak");
         printf("10. Status Sakit Berat Saat Ini: %s\n", p->sakit_berat_saat_ini ? "Ya" : "Tidak");
@@ -450,28 +432,28 @@ void editPasien() {
         pilihan_edit = bacaInteger("Pilih data yang ingin diubah (1-13): ", 1, 13);
 
         switch (pilihan_edit) {
-            case 1: // Edit Nama
+            case 1: 
                 printf("Masukkan Nama Baru: ");
                 fgets(p->nama, PANJANG_NAMA, stdin);
                 p->nama[strcspn(p->nama, "\n")] = 0;
                 printf("Nama berhasil diubah.\n");
                 break;
-            case 2: // Edit Umur
+            case 2: 
                 p->umur = bacaInteger("Masukkan Umur Baru: ", 0, 150);
                 printf("Umur berhasil diubah.\n");
                 break;
-            case 3: // Edit Jenis Kelamin (Perlu hati-hati jika mempengaruhi status hamil)
+            case 3: 
                 printf("Peringatan: Mengubah jenis kelamin dapat mereset status hamil jika diubah ke pria.\n");
                 while (1) {
                     if (!bacaStringLower("Masukkan Jenis Kelamin Baru (pria/wanita/p/w): ", buffer, sizeof(buffer))) continue;
                     if (strcmp(buffer, "pria") == 0 || strcmp(buffer, "p") == 0) {
                         strcpy(p->jenis_kelamin, "pria");
-                        p->hamil = 0; // Reset hamil jika jadi pria
+                        p->hamil = 0; 
                         printf("Jenis kelamin berhasil diubah menjadi pria (status hamil direset).\n");
                         break;
                     } else if (strcmp(buffer, "wanita") == 0 || strcmp(buffer, "w") == 0) {
                         strcpy(p->jenis_kelamin, "wanita");
-                        // Status hamil tidak diubah, user harus edit manual jika perlu
+                        // Status hamil tidak diubah
                         printf("Jenis kelamin berhasil diubah menjadi wanita.\n");
                         break;
                     } else {
@@ -479,30 +461,29 @@ void editPasien() {
                     }
                 }
                 break;
-            case 4: // Edit Riwayat Penyakit
+            case 4:
                 printf("Masukkan Riwayat Penyakit Baru (jika tidak ada, ketik '-'): ");
                 fgets(p->riwayat_penyakit, PANJANG_INFO, stdin);
                 p->riwayat_penyakit[strcspn(p->riwayat_penyakit, "\n")] = 0;
                 printf("Riwayat penyakit berhasil diubah.\n");
                 break;
-            case 5: // Edit Riwayat Alergi
+            case 5:
                 printf("Masukkan Riwayat Alergi Baru (jika tidak ada, ketik '-'): ");
                 fgets(p->riwayat_alergi, PANJANG_INFO, stdin);
                 p->riwayat_alergi[strcspn(p->riwayat_alergi, "\n")] = 0;
                 printf("Riwayat alergi berhasil diubah.\n");
                 break;
-            case 6: // Edit Status Vaksin HPV
+            case 6: 
                 while (1) {
                     if (!bacaStringLower("Masukkan status vaksin HPV baru (belum/lengkap/b/l): ", buffer, sizeof(buffer))) continue;
                     if (strcmp(buffer, "belum") == 0 || strcmp(buffer, "b") == 0) {
                         strcpy(p->status_vaksin, "belum");
-                        // Tanya dosis jika status 'belum'
                         p->dosis_vaksin = bacaInteger("Masukkan jumlah dosis yang sudah diterima (0-3): ", 0, 3);
                         printf("Status vaksin dan dosis berhasil diubah.\n");
                         break;
                     } else if (strcmp(buffer, "lengkap") == 0 || strcmp(buffer, "l") == 0) {
                         strcpy(p->status_vaksin, "lengkap");
-                        p->dosis_vaksin = 3; // Otomatis 3 jika lengkap
+                        p->dosis_vaksin = 3; 
                         printf("Status vaksin berhasil diubah menjadi 'lengkap' (dosis otomatis 3).\n");
                         break;
                     } else {
@@ -510,7 +491,7 @@ void editPasien() {
                     }
                 }
                 break;
-            case 7: // Edit Jumlah Dosis Vaksin
+            case 7: 
                 if (strcmp(p->status_vaksin, "belum") == 0) {
                     p->dosis_vaksin = bacaInteger("Masukkan jumlah dosis baru (0-3): ", 0, 3);
                     printf("Jumlah dosis berhasil diubah.\n");
@@ -518,7 +499,7 @@ void editPasien() {
                     printf("Tidak dapat mengubah dosis jika status vaksin adalah 'lengkap'. Ubah status ke 'belum' terlebih dahulu jika perlu.\n");
                 }
                 break;
-            case 8: // Edit Status Hamil
+            case 8: 
                 if (strcmp(p->jenis_kelamin, "wanita") == 0) {
                     p->hamil = bacaYaTidak("Masukkan status hamil baru");
                     printf("Status hamil berhasil diubah.\n");
@@ -526,19 +507,19 @@ void editPasien() {
                     printf("Tidak dapat mengubah status hamil untuk pasien pria.\n");
                 }
                 break;
-            case 9: // Edit Alergi Berat Vaksin
+            case 9: 
                 p->alergi_berat_vaksin = bacaYaTidak("Masukkan status riwayat alergi berat vaksin (ragi) baru");
                 printf("Status alergi berat vaksin berhasil diubah.\n");
                 break;
-            case 10: // Edit Status Sakit Berat
+            case 10: 
                 p->sakit_berat_saat_ini = bacaYaTidak("Masukkan status sakit berat baru");
                 printf("Status sakit berat berhasil diubah.\n");
                 break;
-            case 11: // Edit Status Imunokompromais
+            case 11: 
                 p->imunokompromais = bacaYaTidak("Masukkan status imunokompromais baru");
                 printf("Status imunokompromais berhasil diubah.\n");
                 break;
-            case 12: // Edit Status Gangguan Darah
+            case 12:
                 p->gangguan_darah = bacaYaTidak("Masukkan status gangguan pembekuan darah baru");
                 printf("Status gangguan darah berhasil diubah.\n");
                 break;
@@ -549,13 +530,6 @@ void editPasien() {
                 printf("Pilihan edit tidak valid.\n");
                 break;
         }
-        // Tidak otomatis cek syarat setelah edit, user bisa cek via menu terpisah
-        /*
-        if (pilihan_edit >= 1 && pilihan_edit <= 12) {
-            printf("\nMemeriksa ulang syarat vaksin untuk %s setelah perubahan:\n", p->nama);
-            cekSyaratVaksin(*p);
-        }
-        */
     } while (pilihan_edit != 13);
 }
 
@@ -565,19 +539,17 @@ void hapusDataPasienKeN(int index) {
         return;
     }
     
-    // Geser elemen setelah index ke kiri
     for (int i = index; i < jumlah_pasien - 1; i++) {
         daftar_pasien[i] = daftar_pasien[i + 1];
     }
     jumlah_pasien--;
 
-    // Realloc memori jika diperlukan (opsional, bisa meningkatkan efisiensi memori)
     if (jumlah_pasien > 0) {
         Pasien *temp = realloc(daftar_pasien, jumlah_pasien * sizeof(Pasien));
         if (temp != NULL) {
             daftar_pasien = temp;
-        } // Jika realloc gagal, tetap gunakan pointer lama
-    } else { // Jika pasien terakhir dihapus
+        } 
+    } else { 
         free(daftar_pasien);
         daftar_pasien = NULL;
     }
@@ -591,16 +563,13 @@ void resetSemuaData() {
     }
     jumlah_pasien = 0;
     printf("Semua data pasien berhasil di-reset.\n");
-    // Juga hapus file data agar konsisten
     if (remove(NAMA_FILE_DATA) == 0) {
         printf("File data %s juga berhasil dihapus.\n", NAMA_FILE_DATA);
     } else {
-        // Tidak fatal jika file tidak ada atau tidak bisa dihapus
-        // perror("Info: Tidak dapat menghapus file data");
     }
 }
 
-void hapusDataPasien() { // Tidak perlu passing argumen, gunakan variabel global
+void hapusDataPasien() { 
     int pilihan_hapus;
     do {
         printf("\n--- Menu Hapus Data Pasien ---\n");
@@ -611,7 +580,7 @@ void hapusDataPasien() { // Tidak perlu passing argumen, gunakan variabel global
         pilihan_hapus = bacaInteger("Pilih opsi (1-3): ", 1, 3);
 
         switch (pilihan_hapus) {
-            case 1: { // Hapus pasien ke-n
+            case 1: { 
                 if (jumlah_pasien == 0) {
                     printf("Tidak ada data pasien untuk dihapus.\n");
                     break;
@@ -621,10 +590,10 @@ void hapusDataPasien() { // Tidak perlu passing argumen, gunakan variabel global
                     printf("%d. %s\n", i + 1, daftar_pasien[i].nama);
                 }
                 int nomor = bacaInteger("Masukkan nomor pasien yang akan dihapus: ", 1, jumlah_pasien);
-                hapusDataPasienKeN(nomor - 1); // Panggil fungsi helper
+                hapusDataPasienKeN(nomor - 1); 
                 break;
             }
-            case 2: // Reset semua data
+            case 2: 
                 if (jumlah_pasien > 0) {
                     int konfirmasi = bacaYaTidak("APAKAH ANDA YAKIN ingin mereset SEMUA data pasien? Tindakan ini tidak dapat dibatalkan.");
                     if (konfirmasi) {
@@ -636,7 +605,7 @@ void hapusDataPasien() { // Tidak perlu passing argumen, gunakan variabel global
                     printf("Tidak ada data untuk di-reset.\n");
                 }
                 break;
-            case 3: // Kembali ke menu utama
+            case 3:
                 printf("Kembali ke menu utama...\n");
                 break;
             default:
@@ -647,7 +616,7 @@ void hapusDataPasien() { // Tidak perlu passing argumen, gunakan variabel global
 }
 
 
-// --- Fungsi Utama (main) --- 
+//Fungsi Utama (main)
 int main() {
     int pilihan;
     muatDataDariFile();
@@ -657,21 +626,20 @@ int main() {
         printf("1. Tambah Data Pasien\n");
         printf("2. Tampilkan Semua Data Pasien (Ringkasan)\n");
         printf("3. Edit Data Pasien\n"); 
-        printf("4. Lihat Detail Syarat Vaksin Pasien\n"); // Menu baru
-        printf("5. Hapus Data Pasien\n"); // Nomor disesuaikan
-        printf("6. Keluar dari program\n"); // Nomor disesuaikan
+        printf("4. Lihat Detail Syarat Vaksin Pasien\n"); 
+        printf("5. Hapus Data Pasien\n"); 
+        printf("6. Keluar dari program\n"); 
         printf("===============================================\n");
         printf("Jumlah Pasien Tersimpan: %d\n", jumlah_pasien);
-        // Sesuaikan rentang pilihan
         printf("Pilih menu (1-6): "); 
 
         if (scanf("%d", &pilihan) != 1) {
             printf("Input tidak valid. Masukkan angka menu.\n");
             bersihkan_buffer_stdin();
-            pilihan = 0; // Set pilihan tidak valid untuk loop ulang
+            pilihan = 0; 
             continue;
         }
-        bersihkan_buffer_stdin(); // Bersihkan buffer setelah scanf
+        bersihkan_buffer_stdin(); 
 
         switch (pilihan) {
             case 1:
@@ -683,28 +651,24 @@ int main() {
             case 3:
                 editPasien(); 
                 break;
-            case 4: // Handler untuk menu baru
+            case 4: 
                 lihatDetailPasien();
                 break;
-            case 5: // Handler untuk hapus (nomor baru)
+            case 5:
                 hapusDataPasien();
                 break; 
-            case 6: // Handler untuk keluar (nomor baru)
+            case 6:
                 printf("Menyimpan data sebelum keluar...\n");
                 simpanDataKeFile();
                 printf("Keluar dari program.\n");
                 break;
             default:
-                // Sesuaikan pesan error
                 printf("Pilihan tidak valid. Masukkan angka 1-6.\n"); 
         }
-    } while (pilihan != 6); // Sesuaikan kondisi keluar
-
-    // Bebaskan memori sebelum keluar
+    } while (pilihan != 6);
     if (daftar_pasien != NULL) {
         free(daftar_pasien);
     }
     printf("Terima kasih!\n");
     return 0;
 }
-
